@@ -27,10 +27,10 @@ namespace Sitecore.Support.XA.Foundation.SitecoreExtensions.Services
       #region fix
       System.Collections.Specialized.NameValueCollection scFormCollection =
         this.Context.Items["SC_FORM"] as System.Collections.Specialized.NameValueCollection;
-      if (scFormCollection != null)
+      if (scFormCollection != null && scFormCollection.Count != 0)
       {
         string currentCELanguage = scFormCollection["scLanguage"];
-        if (currentCELanguage != "")
+        if (!string.IsNullOrEmpty(currentCELanguage))
         {
           item2 = item2.Database.GetItem(item2.ID, Sitecore.Globalization.Language.Parse(currentCELanguage));
         }
