@@ -2,14 +2,12 @@
 {
   using Microsoft.Extensions.DependencyInjection;
   using Sitecore.Abstractions;
-  using Sitecore.Data;
   using Sitecore.Data.Items;
   using Sitecore.DependencyInjection;
   using Sitecore.Web;
-  using System;
   using System.Collections.Generic;
   using System.Linq;
-  using System.Runtime.CompilerServices;
+  using Sitecore.XA.Foundation.Multisite.Extensions;
   using System.Web;
 
   public class SiteInfoResolver : Sitecore.XA.Foundation.Multisite.SiteInfoResolver
@@ -22,7 +20,6 @@
       {
         BaseSiteContextFactory siteContextFactory = ServiceLocator.ServiceProvider.GetService<BaseSiteContextFactory>();
         return _sites ?? (_sites = from s in siteContextFactory.GetSites()
-                                   where s.EnablePreview
                                    orderby s.RootPath descending
                                    select s);
       }
@@ -33,6 +30,10 @@
       if (item != null)
       {
         SiteInfo[] possibleSites = base.DiscoverPossibleSites(item);
+        if (item.IsSxaSite())
+        {
+          possibleSites = possibleSites.Where(x => x.Properties.AllKeys.Contains("IsSxaSite")).ToArray();
+        }
         if (possibleSites.Length <= 1)
         {
           return possibleSites.FirstOrDefault();
