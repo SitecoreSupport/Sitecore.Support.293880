@@ -7,6 +7,7 @@
   using Sitecore.DependencyInjection;
   using Sitecore.Web;
   using System.Collections.Generic;
+  using Sitecore.XA.Foundation.Multisite.Extensions;
   using System.Linq;
   using System.Web;
 
@@ -20,7 +21,6 @@
       {
         BaseSiteContextFactory service = ServiceLocator.ServiceProvider.GetService<BaseSiteContextFactory>();
         return _sites ?? (_sites = from s in service.GetSites()
-                                   where s.EnablePreview
                                    orderby s.RootPath descending
                                    select s);
       }
@@ -31,6 +31,10 @@
       if (item != null)
       {
         SiteInfo[] array = DiscoverPossibleSites(item);
+        if (item.IsSxaSite())
+        {
+          array = array.Where(x => x.Properties.AllKeys.Contains("IsSxaSite")).ToArray();
+        }
         if (array.Length <= 1)
         {
           return array.FirstOrDefault();
