@@ -35,6 +35,10 @@
         {
           array = array.Where(x => x.Properties.AllKeys.Contains("IsSxaSite")).ToArray();
         }
+        else
+        {
+          array = array.Where(x => x.Properties.AllKeys.Contains("enablePreview")).ToArray();
+        }
         if (array.Length <= 1)
         {
           return array.FirstOrDefault();
