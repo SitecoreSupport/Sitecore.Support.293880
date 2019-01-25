@@ -34,6 +34,10 @@
         {
           possibleSites = possibleSites.Where(x => x.Properties.AllKeys.Contains("IsSxaSite")).ToArray();
         }
+        else
+        {
+          possibleSites = possibleSites.Where(x => x.Properties.AllKeys.Contains("enablePreview")).ToArray();
+        }
         if (possibleSites.Length <= 1)
         {
           return possibleSites.FirstOrDefault();
