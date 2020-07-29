@@ -9,22 +9,27 @@
   using System.Linq;
   using Sitecore.XA.Foundation.Multisite.Extensions;
   using System.Web;
+  using System.Reflection;
 
   public class SiteInfoResolver : Sitecore.XA.Foundation.Multisite.SiteInfoResolver
   {
-    private IEnumerable<SiteInfo> _sites;
+    private FieldInfo _sites = typeof(Sitecore.XA.Foundation.Multisite.SiteInfoResolver).GetField("_sites", BindingFlags.NonPublic | BindingFlags.Instance);
 
     public override IEnumerable<SiteInfo> Sites
     {
       get
       {
-        BaseSiteContextFactory siteContextFactory = ServiceLocator.ServiceProvider.GetService<BaseSiteContextFactory>();
-        return _sites ?? (_sites = from s in siteContextFactory.GetSites()
-                                   orderby s.RootPath descending
-                                   select s);
+        if (_sites.GetValue(this) == null)
+        {
+          BaseSiteContextFactory siteContextFactory = ServiceLocator.ServiceProvider.GetService<BaseSiteContextFactory>();
+          _sites.SetValue(this, siteContextFactory.GetSites().OrderByDescending(s => s.RootPath));
+        }
+
+        return (IEnumerable<SiteInfo>)_sites.GetValue(this);
+
       }
     }
-    
+
     public override SiteInfo GetSiteInfo(Item item)
     {
       if (item != null)
